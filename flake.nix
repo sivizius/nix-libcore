@@ -2,7 +2,7 @@
   description                           =   "Core library of general-purpose expressions worth implementing as intrinsics";
   inputs
   =   {
-        intrinsics.url                  =   "/home/sivizius/Projects/Active/nixfiles/intrinsics";
+        intrinsics.url                  =   "github:sivizius/nix-intrinsics/master";
       };
   outputs
   =   { intrinsics, ... }:
