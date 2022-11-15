@@ -1,0 +1,23 @@
+{
+  "nodes": {
+    "intrinsics": {
+      "locked": {
+        "lastModified": 1668416153,
+        "narHash": "sha256-PGTPWlToA9J57hWd9v34cvEBtSvPbuyM4wbv1tCGLNQ=",
+        "type": "git",
+        "url": "file:///home/sivizius/Projects/Active/nixfiles/intrinsics"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:///home/sivizius/Projects/Active/nixfiles/intrinsics"
+      }
+    },
+    "root": {
+      "inputs": {
+        "intrinsics": "intrinsics"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
