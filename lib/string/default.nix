@@ -103,15 +103,15 @@ let
               then
                 if value
                 then
-                  "true"
+                  "1"
                 else
-                  "false"
+                  ""
               else
                 if value
                 then
-                  "1"
+                  "true"
                 else
-                  "";
+                  "false";
           float                         =   intrinsics.toString value;
           int                           =   integer.toString value;
           lambda
@@ -145,8 +145,11 @@ let
               else
                 debug'.panic "cannot coerse a function to a string";
           list
-          =   if  maxDepth == null
-              ||  depth < maxDepth
+          =   if value == []
+              then
+                "[]"
+              else if maxDepth == null
+              ||      depth < maxDepth
               then
                 let
                   body
@@ -167,7 +170,10 @@ let
           null                          =   "null";
           path                          =   toString value;#"${value}";
           set
-          =   if  display
+          =   if value == {}
+              then
+                "{}"
+              else if  display
               ||  !( value ? __toString )
               then
                 if  maxDepth == null

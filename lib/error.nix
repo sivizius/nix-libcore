@@ -1,6 +1,6 @@
 { intrinsics, ... }:
 let
-  panic                                 =   intrinsics.abort;
+  panic                                 =   intrinsics.throw;
 in
 {
   inherit panic;

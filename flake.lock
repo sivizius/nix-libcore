@@ -2,14 +2,18 @@
   "nodes": {
     "intrinsics": {
       "locked": {
-        "lastModified": 1668416153,
+        "lastModified": 1668518858,
         "narHash": "sha256-PGTPWlToA9J57hWd9v34cvEBtSvPbuyM4wbv1tCGLNQ=",
-        "type": "git",
-        "url": "file:///home/sivizius/Projects/Active/nixfiles/intrinsics"
+        "owner": "sivizius",
+        "repo": "nix-intrinsics",
+        "rev": "d32fd5365e3209ac48740e29680b5ded12765c47",
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "file:///home/sivizius/Projects/Active/nixfiles/intrinsics"
+        "owner": "sivizius",
+        "ref": "development",
+        "repo": "nix-intrinsics",
+        "type": "github"
       }
     },
     "root": {

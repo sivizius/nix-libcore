@@ -42,42 +42,13 @@ let
   =   intrinsics.bitAnd;
 
   ceil#: int | float -> int
-  =   intrinsics.ceil
-  or  (
-        let
-          nullDec                       =   ( split 1.0 ).dec;
-        in
-          value:
-            matchNumber value
-            {
-              int                       =   value;
-              float
-              =   let
-                    parts               =   split value;
-                    int                 =   toInteger parts.int;
-                  in
-                    if  parts.dec == nullDec
-                    ||  value < 0
-                    then
-                      int
-                    else
-                      int + 1;
-            }
-        );
+  =   intrinsics.ceil;
 
   div#: int | float -> int | float -> int | float
   =   intrinsics.div or (a: b: ( assertNumber a ) / ( assertNumber b ));
 
   floor#: int | float -> int
-  =   intrinsics.floor
-  or  (
-        value:
-          matchNumber
-          {
-            int                         =   value;
-            float                       =   0 - ceil ( 0 - value );
-          }
-      );
+  =   intrinsics.floor;
 
   lessThan#: int | float -> int | float -> int | float
   =   intrinsics.lessThan or (a: b: ( assertNumber a ) < ( assertNumber b ));
@@ -124,15 +95,6 @@ let
   round'#: float -> int
   =   value: floor ( value + 0.5 );
 
-  split#: value -> { int: string, dec: string }
-  =   value:
-        let
-          list                          =   match "([^.]+)[.](.+)" (string value);
-          int                           =   get list 0;
-          dec                           =   get list 1;
-        in
-          { inherit int dec; };
-
   sub#: int | float -> int | float -> int | float
   =   intrinsics.sub or (a: b: (assertNumber a) - (assertNumber b));
 
@@ -145,34 +107,33 @@ let
         {
           int                           =   1.0 * value;
           float                         =   value;
-          string
+          /*string
           =   let
-                parts                   =   split value;
+                parts                   =   string.match "([0-9]*)[.](0*)([0-9]*)" value;
                 len                     =   length parts.dec;
               in
                 ( ( 1.0 * ( toInteger parts.dec ) ) / ( pow 10 len ) )
-                + ( toInteger parts.int );
+                + ( toInteger parts.int );*/
         }
         ( debug'.panic "toFloat" "Cannot convert ${getPrimitive value} to float." );
 
-
   toInteger#: int | float | string -> int
   =   value:
-      matchOrDefault value
-      {
-        float                           =   round' value;
-        int                             =   value;
-        string
-        =   let
-              result                    =   toInteger' value;
-            in
-              if result != null
-              then
-                result
-              else
-                debug.panic "toInteger" "Could not convert string ${value} to int!";
-      }
-      ( debug'.panic "toInteger" "Could not convert type ${type value} to int!" );
+        matchOrDefault value
+        {
+          float                         =   round' value;
+          int                           =   value;
+          string
+          =   let
+                result                  =   toInteger' value;
+              in
+                if result != null
+                then
+                  result
+                else
+                  debug.panic "toInteger" "Could not convert string ${value} to int!";
+        }
+        ( debug'.panic "toInteger" "Could not convert type ${type value} to int!" );
 
   toInteger'#: string -> int | null
   =   value:
@@ -218,38 +179,69 @@ let
           factor                        =   pow 10 precision;
           value'                        =   string ( round ( value * factor ) );
           length                        =   string.length value';
+          padding                       =   string.concat (list.generate (_: "0") (precision - length));
         in
-        {
-          integer                       =   string.slice 0 (length - precision) value';
-          decimal                       =   string.slice (length - precision) precision value';
-        };
+          debug.debug "splitFloat"
+          {
+            text                        =   "called with/calculated:";
+            data
+            =   {
+                  inherit value precision factor value' length;
+                };
+          }
+          (
+            if length > precision
+            then
+              let
+                mid                     =   length - precision;
+                integer                 =   string.slice  0   mid       value';
+                decimal                 =   string.slice  mid precision value';
+              in
+                debug.debug "splitFloat"
+                {
+                  text                  =   "length > precision";
+                  data                  =   { inherit integer decimal mid; };
+                }
+                { inherit decimal integer; }
+            else
+              let
+                integer                 =   "0";
+                decimal                 =   "${padding}${value'}";
+              in
+                debug.debug "splitFloat"
+                {
+                  text                  =   "length <= precision";
+                  data                  =   { inherit integer decimal padding; };
+                }
+                { inherit decimal integer; }
+          );
 
   toStringWithPrecision#: int | float -> int -> string
   =   value:
       precision:
         let
-          value'                        =   splitFloat value          precision;
-          valuePos                      =   splitFloat (value + 1.0)  precision;
-          valueNeg                      =   splitFloat (value - 1.0)  precision;
-          valueWithPrecision
+          precision'
           =   matchOrDefault precision
               {
-                int
-                =   if precision == 0
-                    then
-                      "${string (round value)}"
-                    else if value >= 1.0
-                    || value <= (-1.0)
-                    then
-                      "${value'.integer}.${value'.decimal}"
-                    else if value >= 0
-                    then
-                      "0.${valuePos.decimal}"
-                    else
-                      "-0.${valueNeg.decimal}";
-                null                    =   toSignificantString value;
+                int                     =   precision;
+                null                    =   getPrecision value;
               }
               ( debug'.panic "toStringWithPrecision" "Invalid Precision: Int or null expected!" );
+          valuePos                      =   splitFloat (0.0 + value)  precision';
+          valueNeg                      =   splitFloat (0.0 - value)  precision';
+          valueWithPrecision
+          =   debug.info "toStringWithPrecision" { text = "value"; data = value; }
+              debug.info "toStringWithPrecision" { text = "precision"; data = [ precision precision' ]; }
+              (
+                if precision' == 0
+                then
+                  "${string (round value)}"
+                else if value >= 0
+                then
+                  "${valuePos.integer}.${valuePos.decimal}"
+                else
+                  "-${valueNeg.integer}.${valueNeg.decimal}"
+              );
         in
           matchOrDefault value
           {
@@ -259,7 +251,7 @@ let
             set
             =   (
                   { from, till }:
-                  "${toStringWithPrecision value.from precision}–${toStringWithPrecision value.till precision}"
+                  "${toStringWithPrecision from precision}–${toStringWithPrecision till precision}"
                 )
                 value;
           }
@@ -267,56 +259,25 @@ let
 
   toSignificantString#: int | float -> string
   =   value:
-        let
-          parts                         =   split value;
-          significant
-          =   fold
-              (
-                state:
-                character:
-                  if state.done
-                  then
-                    state
-                  else if state.rest == "1"
-                  then
-                    state // { rest = "1${character}"; }
-                  else if state.rest != null
-                  then
-                    state // { rest = string ( round ( ( toInteger "${state.rest}${character}" ) / 10.0 ) ); done = true; }
-                  else if character == "0"
-                  then
-                    state // { result = "${state.result}0"; }
-                  else
-                    state // { rest = character; }
-              )
-              {
-                result                  =   "";
-                rest                    =   null;
-                done                    =   false;
-              }
-              ( toCharacters parts.dec );
-          rest
-          =   if significant.rest != null
-              then
-                ".${significant.result}${significant.rest}"
-              else
-                "";
-        in
-          matchNumber value
-          {
-            int                         =   string value;
-            float
-            =   if value > 1
-                || value < ( 0 - 1 )
-                then
-                  parts.int
-                else
-                  "${if value < 0 then "-" else ""}0${rest}";
-          };
+        toStringWithPrecision value null;
+
+  getPrecision
+  =   value:
+        debug.info "getPrecision" { text = "value"; data = value; }
+        (
+          if  value == 0.0
+          ||  value >= 2.0
+          ||  value <= -2.0
+          then
+            0
+          else
+            (getPrecision (value * 10)) + 1
+        );
+
   xor#: int -> int -> int
   =   intrinsics.bitXor;
 in
 {
-  inherit abs add and ceil div floor lessThan moreThan mul neg or pow round round' split sub sum xor;
+  inherit abs add and ceil div floor lessThan moreThan mul neg or pow round round' sub sum xor;
   inherit toFloat toInteger toInteger' toSignificantString toStringWithMaximumPrecision toStringWithPrecision;
 }
