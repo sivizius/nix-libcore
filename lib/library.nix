@@ -1,6 +1,6 @@
 { intrinsics, ... }:
 let
-  inherit (intrinsics) attrNames foldl' mapAttrs scopedImport typeOf;
+  inherit(intrinsics) attrNames foldl' mapAttrs scopedImport typeOf;
 
   module
   =   __path__:

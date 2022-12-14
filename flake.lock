@@ -2,11 +2,11 @@
   "nodes": {
     "intrinsics": {
       "locked": {
-        "lastModified": 1668518858,
-        "narHash": "sha256-PGTPWlToA9J57hWd9v34cvEBtSvPbuyM4wbv1tCGLNQ=",
+        "lastModified": 1671054550,
+        "narHash": "sha256-TvoK5trlSj0C4NcXSse/lwTvUYephDPYcpGnhxyiCbA=",
         "owner": "sivizius",
         "repo": "nix-intrinsics",
-        "rev": "d32fd5365e3209ac48740e29680b5ded12765c47",
+        "rev": "d9797abb5c1f046bbfd7a6e2618b5b9497ea3152",
         "type": "github"
       },
       "original": {

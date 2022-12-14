@@ -5,25 +5,27 @@
   ...
 }:
   let
-    inherit (import ./library.nix { inherit intrinsics; }) extend module;
+    checkIntrinsics
+    =   {
+          # necessary!
+          abort, attrNames, bitAnd, bitOr, bitXor, deepSeq, elemAt, fetchurl, filterSource, foldl', functionArgs, import,
+          length, match, path, pathExists, placeholder, readDir, readFile, scopedImport, seq, split, storePath,
+          substring, throw, toFile, toString, tryEval, typeOf,
+
+          # maybe possible to construct?
+          fetchGit, toJSON, fetchTarball, toXML,
+
+          ...
+        } @ x:
+          x;
+
+    intrinsics'                         =   checkIntrinsics intrinsics;
+    inherit (import ./library.nix { intrinsics = intrinsics'; }) extend module;
   in
     extend
     {
       inherit context checked;
-      intrinsics
-      =   (
-            {
-              # necessary!
-              abort, attrNames, bitAnd, bitOr, bitXor, deepSeq, elemAt, fetchurl, filterSource, functionArgs, import,
-              length, match, path, pathExists, placeholder, readDir, readFile, scopedImport, seq, split, storePath,
-              substring, throw, toFile, toString, tryEval, typeOf,
-
-              # maybe possible to construct?
-              fetchGit, toJSON, fetchTarball, toXML,
-
-              ...
-            } @ x: x
-          ) intrinsics;
+      intrinsics                        =   intrinsics';
     }
     {
       bool                              =   module ./bool.nix;
