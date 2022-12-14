@@ -66,21 +66,30 @@ let
       );
 
   import#: path -> any
-  =   path:
-        importWithContext path [];
+  =   intrinsics.import;#path:
+        #importWithContext path [];
 
   importScoped#: path -> { ... } -> any
   =   intrinsics.scopedImport
   or  (debug'.unimplemented "importScoped");
 
+  importScoped'
+  =   this:
+        __trace this
+        importScoped this;
+
   importWithContext#: path -> { ... } -> any
   =   path:
       context:
-        importScoped path
-        {
-          context                       =   context ++ [ (getBaseName path) ];
-          import                        =   importWithContext;
-        };
+        let
+          context'                      =   context ++ [ (getBaseName path) ];
+        in
+          __trace context
+          importScoped' path
+          {
+            context                     =   context';
+            import                      =   path: importWithContext context' path;
+          };
 
   nixPaths#: [ { path: string, prefix: string } ]?
   =   intrinsics.nixPath or null;

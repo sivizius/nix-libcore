@@ -1,17 +1,33 @@
-{ ... } @ libs:
+{ context, ... } @ libs:
   let
-    lib                                 =   import ./lib libs;
+    lib
+    =   import ./lib
+        (
+          libs
+          //  {
+                context                 =   context ++ [ "lib" ];
+              }
+        );
+    tests
+    =   import ./tests
+        (
+          lib
+          //  {
+                context                 =   context ++ [ "tests" ];
+              }
+        );
+    inherit(lib) check list;
   in
   {
-    inherit lib;
+    inherit lib tests;
     checks
-    =   lib.list.fold
+    =   list.fold
         (
           { ... } @ result:
           system:
             result
             //  {
-                  ${system}.default     =   lib.check system lib.tests {};
+                  ${system}.default     =   check system tests {};
                 }
         )
         {}

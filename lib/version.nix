@@ -5,6 +5,7 @@ let
   Version# { major: string, minor: string, patch: string } -> Version
   =   { major, minor, patch }:
       {
+        __type__                        =   "Version";
         inherit major minor patch;
       };
 in

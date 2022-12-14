@@ -52,7 +52,10 @@ let
         &&  maybeInteger  zone
         &&  maybeString   zoneName
         then
-          { inherit year month day hour minute second nanosecond zone zoneName; }
+        {
+          __type__                      =   "DateTime";
+          inherit year month day hour minute second nanosecond zone zoneName;
+        }
         else
           debug'.error "DateTime"
           {

@@ -157,6 +157,17 @@ let
           dictionary.${name} or default
       );
 
+  getKeySource#: string -> { string -> T } -> { column: int; file: string; line: int; }
+  =   intrinsics.unsafeGetAttrPos;
+
+  getSource
+  =   { ... } @ self:
+        if self != {}
+        then
+          (getKeySource (list.head (names self)) self).file
+        else
+          null;
+
   # string -> { ... } -> bool
   hasAttribute
   =   intrinsics.hasAttr

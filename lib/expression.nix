@@ -1,4 +1,4 @@
 { intrinsics, ... }:
 {
-  inherit (intrinsics) deepSeq fromJSON seq toJSON toXML tryEval;
+  inherit (intrinsics) deepSeq fromJSON fromTOML seq toJSON toXML tryEval;
 }

@@ -3,7 +3,10 @@ let
   inherit(type) never;
 in
 {
-  derivation
+  isDerivation
+  =   type.isDerivation;
+
+  make
   =   intrinsics.derivation
   or  (
         { name, builder, system, ... } @ drvAttrs:
@@ -19,4 +22,7 @@ in
           type                          =   "derivation";
         }
       );
+
+  makeStrikt
+  =   intrinsics.derivationStrikt;
 }

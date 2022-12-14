@@ -5,9 +5,9 @@
   ...
 }:
   let
-    inherit (import ./library.nix { inherit intrinsics; }) create module;
+    inherit (import ./library.nix { inherit intrinsics; }) extend module;
   in
-    create
+    extend
     {
       inherit context checked;
       intrinsics
@@ -24,6 +24,8 @@
               ...
             } @ x: x
           ) intrinsics;
+    }
+    {
       bool                              =   module ./bool.nix;
       check                             =   module ./check.nix;
       debug                             =   module ./debug.nix;
@@ -44,7 +46,6 @@
       set                               =   module ./set.nix;
       string                            =   module ./string;
       target                            =   module ./target;
-      tests                             =   module ./tests;
       time                              =   module ./time.nix;
       type                              =   module ./type;
       version                           =   module ./version.nix;
